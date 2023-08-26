@@ -1,6 +1,6 @@
 "use client"
 import { Skeleton } from "@/components/ui/skeleton"
-import Link from "next/link"
+
 import {
   ColumnDef,
   flexRender,
@@ -27,7 +27,6 @@ import {
   DialogDescription,
   DialogHeader,
   DialogFooter,
-  DialogTrigger,
 } from "@/components/ui/dialog"
 
 
@@ -54,7 +53,6 @@ export function DataTable<TData, TValue>({
   const [dialogContent, setDialogContent] = React.useState<Job>()
   const [dialogOpen, setDialogOpen] = React.useState(false)
 
-
   const handleDialogOpen = (content: Job) => {
     setDialogContent(content)
     setDialogOpen(true)
@@ -77,10 +75,10 @@ export function DataTable<TData, TValue>({
           placeholder="Filter titles..."
           value={(table.getColumn("title")?.getFilterValue() as string) ?? ""}
           onChange={(event) => {
-              setIsFilterLoading(true)
-              setTimeout(() => setIsFilterLoading(false), 500)
-              table.getColumn("title")?.setFilterValue(event.target.value)
-            }
+            setIsFilterLoading(true)
+            setTimeout(() => setIsFilterLoading(false), 500)
+            table.getColumn("title")?.setFilterValue(event.target.value)
+          }
           }
           className="max-w-sm"
         />
@@ -96,9 +94,9 @@ export function DataTable<TData, TValue>({
                       {header.isPlaceholder
                         ? null
                         : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
                     </TableHead>
                   )
                 })}
@@ -115,8 +113,8 @@ export function DataTable<TData, TValue>({
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
-                      {isFilterLoading ? 
-                        <Skeleton key={Math.random() * 10000} className="h-5 m-1 w-100 rounded-full"/>
+                      {isFilterLoading ?
+                        <Skeleton key={Math.random() * 10000} className="h-5 m-1 w-100 rounded-full" />
                         : flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </TableCell>
                   ))}
@@ -133,13 +131,16 @@ export function DataTable<TData, TValue>({
         </Table>
       </div>
       <Dialog open={dialogOpen} onOpenChange={() => dialogOpen && setDialogOpen(false)}>
-          <DialogContent>
+        <DialogContent>
+          <DialogHeader>
+          {dialogContent?.title}
+          </DialogHeader>
           <DialogDescription>
             {dialogContent?.description}
           </DialogDescription>
           <DialogFooter>
             <Button asChild>
-              <a target="_blank" href={dialogContent?.applicationLink}>
+              <a target="_blank" href={dialogContent?.applicationUrl}>
                 Apply Here
               </a>
             </Button>

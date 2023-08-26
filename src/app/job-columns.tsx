@@ -20,9 +20,19 @@ export const columns: ColumnDef<Job>[] = [
   {
     accessorKey: "description",
     header: "Description",
+    cell: ({ row }) => {
+      const value = row.getValue("description") as string
+      const formatted = value.substring(0, 50) + "..."
+      return formatted
+    },
   },
   {
     accessorKey: "dateAdded",
     header: "Date Added",
+    cell: ({ row }) => {
+      const value = row.getValue("dateAdded") as string
+      const formatted = new Date(value).toLocaleString('en-US', { timeZone: 'UTC' })
+      return formatted
+    },
   },
 ]

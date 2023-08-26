@@ -1,40 +1,20 @@
-import { columns } from "@/app/job-columns"
-import { DataTable } from "@/components/ui/data-table"
-
+import { dehydrate, Hydrate } from '@tanstack/react-query'
+import getQueryClient from '@/app/getQueryClient'
+import { Jobs } from '@/app/jobs'
+import { getJobs } from "@/app/api";
 export type Job = {
   id: string
   title: string
   description: string
   dateAdded: string
-  applicationLink: string
+  applicationUrl: string
 }
-
- 
-export const jobs: Job[] = [
-  {
-    id: "728ed52f",
-    title: 'Software Engineer',
-    description: 'We are looking for a software engineer to join our team.',
-    dateAdded: '2023-08-01',
-    applicationLink: 'https://www.google.com',
-  },
-  {
-    id: "489e1d42",
-    title: 'Software Engineer 2',
-    description: 'We are looking for a software engineer to join our team.',
-    dateAdded: '2021-08-19',
-    applicationLink: 'https://www.google.com',
-  },
-]
-
-async function getData(): Promise<Job[]> {
-  // Fetch data from your API here.
-  return jobs;
-}
-
 
 export default async function Home() {
-  const data = await getData()
+  const queryClient = getQueryClient()
+  await queryClient.prefetchQuery(['jobs'], getJobs)
+  const dehydratedState = dehydrate(queryClient)
+
 
   return (
     <main className="container min-h-screen p-10">
@@ -45,9 +25,9 @@ export default async function Home() {
         Find work that fulfills.
       </h2>
       <p>ℹ️ Click on the job listing to start applying.</p>
-      <div className="mx-auto">
-        <DataTable columns={columns} data={data} />
-      </div>
+      <Hydrate state={dehydratedState}>
+        <Jobs />
+      </Hydrate>
     </main>
   )
 }
