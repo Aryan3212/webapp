@@ -136,7 +136,7 @@ export function DataTable<TData, TValue>({
             <h2>{dialogContent?.title}</h2>
             <h4>{dialogContent?.companyName}</h4>
             <p>{dialogContent?.location}</p>
-            <p>💼: {dialogContent?.minimumExperience}</p>
+            <p>💼: {dialogContent?.minimumExperience} years</p>
           </DialogHeader>
           <DialogDescription>
             {dialogContent?.description}

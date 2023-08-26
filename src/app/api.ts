@@ -1,5 +1,6 @@
+const baseUrl = process.env.NEXT_PUBLIC_BASE_URL
 
 export async function getJobs() {
-    const response = await fetch('http://127.0.0.1:8000/jobs/')
+    const response = await fetch(`${baseUrl}/jobs/`)
     return response.json()
 }
