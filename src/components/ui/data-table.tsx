@@ -133,7 +133,10 @@ export function DataTable<TData, TValue>({
       <Dialog open={dialogOpen} onOpenChange={() => dialogOpen && setDialogOpen(false)}>
         <DialogContent>
           <DialogHeader>
-          {dialogContent?.title}
+            <h2>{dialogContent?.title}</h2>
+            <h4>{dialogContent?.companyName}</h4>
+            <p>{dialogContent?.location}</p>
+            <p>💼: {dialogContent?.minimumExperience}</p>
           </DialogHeader>
           <DialogDescription>
             {dialogContent?.description}

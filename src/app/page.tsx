@@ -8,6 +8,9 @@ export type Job = {
   description: string
   dateAdded: string
   applicationUrl: string
+  companyName: string
+  minimumExperience: string
+  location: string
 }
 
 export default async function Home() {

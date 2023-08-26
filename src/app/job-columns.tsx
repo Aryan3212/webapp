@@ -18,6 +18,18 @@ export const columns: ColumnDef<Job>[] = [
     header: "Tilte",
   },
   {
+    accessorKey: "companyName",
+    header: "Company Name",
+  },
+  {
+    accessorKey: "minimumExperience",
+    header: "Minimum Experience",
+  },
+  {
+    accessorKey: "location",
+    header: "Location",
+  },
+  {
     accessorKey: "description",
     header: "Description",
     cell: ({ row }) => {
