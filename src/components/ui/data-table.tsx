@@ -1,6 +1,6 @@
 "use client"
 import { Skeleton } from "@/components/ui/skeleton"
-
+import Link from "next/link"
 import {
   ColumnDef,
   flexRender,
@@ -35,6 +35,8 @@ import { Input } from "@/components/ui/input"
 
 import * as React from "react"
 
+import type { Job } from "@/app/page"
+
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
   data: TData[]
@@ -49,7 +51,14 @@ export function DataTable<TData, TValue>({
     []
   )
   const [isFilterLoading, setIsFilterLoading] = React.useState(false)
+  const [dialogContent, setDialogContent] = React.useState<Job>()
+  const [dialogOpen, setDialogOpen] = React.useState(false)
 
+
+  const handleDialogOpen = (content: Job) => {
+    setDialogContent(content)
+    setDialogOpen(true)
+  }
   const table = useReactTable({
     data,
     columns,
@@ -99,32 +108,19 @@ export function DataTable<TData, TValue>({
           <TableBody>
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
-                <Dialog key={row.id}>
                 <TableRow
+                  key={row.id}
                   data-state={row.getIsSelected() && "selected"}
+                  onClick={() => handleDialogOpen(row.original as Job)}
                 >
                   {row.getVisibleCells().map((cell) => (
-                    <DialogTrigger key={cell.id}>
-                    <TableCell>
-                      
+                    <TableCell key={cell.id}>
                       {isFilterLoading ? 
                         <Skeleton key={Math.random() * 10000} className="h-5 m-1 w-100 rounded-full"/>
                         : flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </TableCell>
-                    </DialogTrigger>
                   ))}
                 </TableRow>
-                <DialogContent>
-                <DialogHeader>
-                  <DialogDescription>
-                    {row.getValue("description")}
-                  </DialogDescription>
-                </DialogHeader>
-                <DialogFooter>
-                  <Button type="submit">Confirm</Button>
-                </DialogFooter>
-              </DialogContent>
-                </Dialog>
               ))
             ) : (
               <TableRow>
@@ -136,6 +132,20 @@ export function DataTable<TData, TValue>({
           </TableBody>
         </Table>
       </div>
+      <Dialog open={dialogOpen} onOpenChange={() => dialogOpen && setDialogOpen(false)}>
+          <DialogContent>
+          <DialogDescription>
+            {dialogContent?.description}
+          </DialogDescription>
+          <DialogFooter>
+            <Button asChild>
+              <a target="_blank" href={dialogContent?.applicationLink}>
+                Apply Here
+              </a>
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </>
   )
 }

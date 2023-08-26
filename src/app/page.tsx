@@ -1,7 +1,7 @@
 import { columns } from "@/app/job-columns"
 import { DataTable } from "@/components/ui/data-table"
 
-type Job = {
+export type Job = {
   id: string
   title: string
   description: string
@@ -44,6 +44,7 @@ export default async function Home() {
       <h2 className="scroll-m-10 mb-4 pb-2 text-3xl font-semibold tracking-tight transition-colors first:mt-0">
         Find work that fulfills.
       </h2>
+      <p>ℹ️ Click on the job listing to start applying.</p>
       <div className="mx-auto">
         <DataTable columns={columns} data={data} />
       </div>
