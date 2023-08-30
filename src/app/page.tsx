@@ -1,13 +1,15 @@
 import { dehydrate, Hydrate } from '@tanstack/react-query'
 import getQueryClient from '@/app/getQueryClient'
 import { Jobs } from '@/app/jobs'
-import { getJobs } from "@/app/api";
+import { getJob, getJobs } from "@/app/api";
+
 export type Job = {
   id: string
   title: string
   description: string
   dateAdded: string
-  applicationUrl: string
+  applicationUrl?: string
+  applicationEmail?: string
   companyName: string
   minimumExperience: string
   location: string
@@ -33,4 +35,32 @@ export default async function Home() {
       </Hydrate>
     </main>
   )
+}
+
+import { Metadata } from 'next';
+ 
+type MetadataProps = {
+  searchParams: { [key: string]: string | string[] | undefined };
+};
+ 
+export async function generateMetadata(
+  { searchParams }: MetadataProps,
+): Promise<Metadata> {
+  const jobId = searchParams.job_id;
+  if(jobId){
+    const job = await getJob(jobId);
+    return {
+      openGraph: {
+        title: job.title + ' | ' + job.companyName,
+        description: `Find more jobs like ${job.title} at Worklist!`,
+        url: '/?job_id=' + jobId,
+      },
+      twitter: {
+        card: 'summary_large_image',
+        title: job.title + ' | ' + job.companyName,
+        description: `Find more jobs like ${job.title} at Worklist!`,
+      },
+    };
+  }
+  return {};
 }
