@@ -36,14 +36,18 @@ import * as React from "react"
 
 import type { Job } from "@/app/page"
 
+import { useEffect } from "react"
+
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
   data: TData[]
+  openRowById?: number
 }
 
-export function DataTable<TData, TValue>({
+export function DataTable<TData extends { id?: number }, TValue>({
   columns,
   data,
+  openRowById,
 }: DataTableProps<TData, TValue>) {
 
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
@@ -57,6 +61,18 @@ export function DataTable<TData, TValue>({
     setDialogContent(content)
     setDialogOpen(true)
   }
+  useEffect(() => {
+    if (openRowById) {
+      const row = data.find((r) => {
+        return r.id === openRowById
+      })
+      console.log(row, 'arst', typeof openRowById)
+      if (row) {
+        console.log(row, 'arst')
+        handleDialogOpen(row as unknown as Job)
+      }
+    }
+  }, [openRowById, data])
   const table = useReactTable({
     data,
     columns,
@@ -109,7 +125,7 @@ export function DataTable<TData, TValue>({
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
-                  onClick={() => handleDialogOpen(row.original as Job)}
+                  onClick={() => handleDialogOpen(row.original as unknown as Job)}
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
@@ -142,11 +158,20 @@ export function DataTable<TData, TValue>({
             {dialogContent?.description}
           </DialogDescription>
           <DialogFooter>
+            { dialogContent?.applicationUrl &&
+              <Button asChild>
+                <a target="_blank" href={dialogContent.applicationUrl}>
+                  Apply Here
+                </a>
+              </Button>
+            }
+            { dialogContent?.applicationEmail &&
             <Button asChild>
-              <a target="_blank" href={dialogContent?.applicationUrl}>
-                Apply Here
+              <a target="_blank" href={'mailto:' + dialogContent.applicationEmail}>
+                Send a mail at {dialogContent.applicationEmail}
               </a>
             </Button>
+            }
           </DialogFooter>
         </DialogContent>
       </Dialog>
