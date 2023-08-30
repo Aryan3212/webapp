@@ -61,8 +61,8 @@ export function DataTable<TData extends { id?: number }, TValue>({
   const [dialogOpen, setDialogOpen] = React.useState(false)
   const [copiedLink, setCopiedLink] = React.useState(false)
 
-  const copyLink = (jobId) => {
-    navigator.clipboard.writeText(window.location.href + '?job_id=' + jobId)
+  const copyLink = () => {
+    navigator.clipboard.writeText(window.location.href)
     setCopiedLink(true)
     setTimeout(() => setCopiedLink(false), 2000)
   }
@@ -171,7 +171,7 @@ export function DataTable<TData extends { id?: number }, TValue>({
               variant={copiedLink ? 'default' : 'outline'}
               disabled={copiedLink}
               aria-label="Copy Link"
-              onClick={() => copyLink(dialogContent?.id)}
+              onClick={() => copyLink()}
             >
               {copiedLink ? <CheckIcon /> : <CopyIcon />}
               Share This Job
