@@ -32,11 +32,14 @@ import {
 
 import { Input } from "@/components/ui/input"
 
+import { Toggle } from "@/components/ui/toggle"
+
 import * as React from "react"
 
 import type { Job } from "@/app/page"
 
 import { useEffect } from "react"
+import { CopyIcon, CheckIcon } from "@radix-ui/react-icons"
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
@@ -56,23 +59,33 @@ export function DataTable<TData extends { id?: number }, TValue>({
   const [isFilterLoading, setIsFilterLoading] = React.useState(false)
   const [dialogContent, setDialogContent] = React.useState<Job>()
   const [dialogOpen, setDialogOpen] = React.useState(false)
+  const [copiedLink, setCopiedLink] = React.useState(false)
 
+  const copyLink = (jobId) => {
+    navigator.clipboard.writeText(window.location.href + '?job_id=' + jobId)
+    setCopiedLink(true)
+    setTimeout(() => setCopiedLink(false), 2000)
+  }
   const handleDialogOpen = (content: Job) => {
+    window.history.pushState({}, null, '?job_id=' + content.id)
     setDialogContent(content)
     setDialogOpen(true)
+  }
+  const onDialogClose = () => {
+    setDialogOpen(false)
+    window.history.pushState({}, null, '/')
   }
   useEffect(() => {
     if (openRowById) {
       const row = data.find((r) => {
         return r.id === openRowById
       })
-      console.log(row, 'arst', typeof openRowById)
       if (row) {
-        console.log(row, 'arst')
         handleDialogOpen(row as unknown as Job)
       }
     }
-  }, [openRowById, data])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
   const table = useReactTable({
     data,
     columns,
@@ -146,13 +159,23 @@ export function DataTable<TData extends { id?: number }, TValue>({
           </TableBody>
         </Table>
       </div>
-      <Dialog open={dialogOpen} onOpenChange={() => dialogOpen && setDialogOpen(false)}>
+      <Dialog modal={true} open={dialogOpen} onOpenChange={() => onDialogClose()}>
         <DialogContent>
           <DialogHeader>
             <h2>{dialogContent?.title}</h2>
             <h4>{dialogContent?.companyName}</h4>
             <p>{dialogContent?.location}</p>
             <p>💼: {dialogContent?.minimumExperience} years</p>
+            <Toggle
+              size="lg"
+              variant={copiedLink ? 'default' : 'outline'}
+              disabled={copiedLink}
+              aria-label="Copy Link"
+              onClick={() => copyLink(dialogContent?.id)}
+            >
+              {copiedLink ? <CheckIcon /> : <CopyIcon />}
+              Share This Job
+            </Toggle>
           </DialogHeader>
           <DialogDescription>
             {dialogContent?.description}
