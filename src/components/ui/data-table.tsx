@@ -105,6 +105,7 @@ export function DataTable<TData extends { id?: number }, TValue>({
           value={(table.getColumn("title")?.getFilterValue() as string) ?? ""}
           onChange={(event) => {
             setIsFilterLoading(true)
+            // Do we need this?
             setTimeout(() => setIsFilterLoading(false), 500)
             table.getColumn("title")?.setFilterValue(event.target.value)
           }
@@ -161,7 +162,7 @@ export function DataTable<TData extends { id?: number }, TValue>({
       </div>
       <Dialog modal={true} open={dialogOpen} onOpenChange={() => onDialogClose()}>
         <DialogContent>
-          <DialogHeader>
+          <DialogHeader className="text-left justify-self-start">
             <h2>{dialogContent?.title}</h2>
             <h4>{dialogContent?.companyName}</h4>
             <p>{dialogContent?.location}</p>
@@ -177,7 +178,7 @@ export function DataTable<TData extends { id?: number }, TValue>({
               Share This Job
             </Toggle>
           </DialogHeader>
-          <DialogDescription>
+          <DialogDescription className="justify-self-start">
             {dialogContent?.description}
           </DialogDescription>
           <DialogFooter className="space-x-0 sm:space-y-0 space-y-2 flex-col">
