@@ -16,19 +16,6 @@ export const metadata: Metadata = {
     title: 'WorkList',
     description: 'Fulfilling work for everyone. Find jobs here!',
   },
-  robots: {
-    index: false,
-    follow: true,
-    nocache: true,
-    googleBot: {
-      index: true,
-      follow: false,
-      noimageindex: true,
-      'max-video-preview': -1,
-      'max-image-preview': 'large',
-      'max-snippet': -1,
-    },
-  },
 }
 
 export default function RootLayout({
