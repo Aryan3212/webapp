@@ -180,16 +180,16 @@ export function DataTable<TData extends { id?: number }, TValue>({
           <DialogDescription>
             {dialogContent?.description}
           </DialogDescription>
-          <DialogFooter>
+          <DialogFooter className="space-x-0 sm:space-y-0 space-y-2 flex-col">
             { dialogContent?.applicationUrl &&
-              <Button asChild>
+              <Button className="text-center" asChild>
                 <a target="_blank" href={dialogContent.applicationUrl}>
                   Apply Here
                 </a>
               </Button>
             }
             { dialogContent?.applicationEmail &&
-            <Button asChild>
+            <Button className="text-center" asChild>
               <a target="_blank" href={'mailto:' + dialogContent.applicationEmail}>
                 Send a mail at {dialogContent.applicationEmail}
               </a>
