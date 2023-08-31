@@ -9,7 +9,9 @@ import { useSearchParams } from "next/navigation";
 
 export const Jobs = () => {
 
-  const { data, isSuccess } = useQuery({ queryKey: ['jobs'], queryFn: getJobs })
+  const { data, isSuccess } = useQuery(
+    { queryKey: ['jobs'], queryFn: getJobs, refetchInterval: 10000 }
+    )
   const searchParams = useSearchParams()
   const jobId = parseInt(searchParams.get('job_id'))
   return (
