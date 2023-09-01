@@ -162,12 +162,13 @@ export function DataTable<TData extends { id?: number }, TValue>({
       </div>
       <Dialog modal={true} open={dialogOpen} onOpenChange={() => onDialogClose()}>
         <DialogContent>
-          <DialogHeader className="text-left justify-self-start">
+          <DialogHeader className="text-left w-100 items-start">
             <h2>{dialogContent?.title}</h2>
             <h4>{dialogContent?.companyName}</h4>
             <p>{dialogContent?.location}</p>
             <p>💼: {dialogContent?.minimumExperience} years</p>
             <Toggle
+              className="w-full"
               size="lg"
               variant={copiedLink ? 'default' : 'outline'}
               disabled={copiedLink}
@@ -178,7 +179,7 @@ export function DataTable<TData extends { id?: number }, TValue>({
               Share This Job
             </Toggle>
           </DialogHeader>
-          <DialogDescription className="justify-self-start">
+          <DialogDescription className="items-start">
             {dialogContent?.description}
           </DialogDescription>
           <DialogFooter className="space-x-0 sm:space-y-0 space-y-2 flex-col">
