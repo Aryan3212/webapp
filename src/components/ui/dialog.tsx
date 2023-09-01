@@ -107,7 +107,7 @@ const DialogDescription = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <DialogPrimitive.Description
     ref={ref}
-    className={cn("text-sm text-muted-foreground overflow-y-auto  scrollbar-track-neutral-500  scrollbar-thumb-neutral-900 scrollbar-thin max-h-[250px]", className)}
+    className={cn("text-sm overflow-y-auto  scrollbar-track-neutral-500  scrollbar-thumb-neutral-900 scrollbar-thin max-h-[250px]", className)}
     {...props}
   />
 ))
