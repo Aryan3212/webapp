@@ -179,9 +179,7 @@ export function DataTable<TData extends { id?: number }, TValue>({
               Share This Job
             </Toggle>
           </DialogHeader>
-          <DialogDescription className="items-start">
-            {dialogContent?.description}
-          </DialogDescription>
+          <div dangerouslySetInnerHTML={{__html : dialogContent?.description}} className="text-sm overflow-y-auto  scrollbar-track-neutral-500  scrollbar-thumb-neutral-900 scrollbar-thin max-h-[250px] items-start"/>
           <DialogFooter className="space-x-0 sm:space-y-0 space-y-2 flex-col">
             { dialogContent?.applicationUrl &&
               <Button className="text-center" asChild>
