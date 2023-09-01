@@ -163,7 +163,7 @@ export function DataTable<TData extends { id?: number }, TValue>({
       <Dialog modal={true} open={dialogOpen} onOpenChange={() => onDialogClose()}>
         <DialogContent>
           <DialogHeader className="text-left w-100 items-start">
-            <h2>{dialogContent?.title}</h2>
+            <h3>{dialogContent?.title}</h3>
             <h4>{dialogContent?.companyName}</h4>
             <p>{dialogContent?.location}</p>
             <p>💼: {dialogContent?.minimumExperience} years</p>
