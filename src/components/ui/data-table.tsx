@@ -39,7 +39,7 @@ interface DataTableProps<TData, TValue> {
   showJobDetails?: Job
 }
 
-export function DataTable<TData extends { showJobDetails?: Job }, TValue>({
+export function DataTable<TData, TValue>({
   columns,
   showJobDetails,
 }: DataTableProps<TData, TValue>) {
