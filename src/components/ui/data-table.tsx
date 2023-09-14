@@ -31,7 +31,7 @@ import * as React from "react"
 import type { Job } from "@/app/page"
 import { useEffect } from "react"
 import { CopyIcon, CheckIcon, BackpackIcon } from "@radix-ui/react-icons"
-import { getJobs, getJob } from "@/app/api";
+import { getJobs } from "@/app/api";
 import { useQuery } from "@tanstack/react-query"
 import { ShadowInnerIcon } from "@radix-ui/react-icons";
 interface DataTableProps<TData, TValue> {
@@ -48,19 +48,23 @@ export function DataTable<TData extends { showJobDetails?: Job }, TValue>({
   const [copiedLink, setCopiedLink] = React.useState(false)
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [search, setSearch] = React.useState<string>('')
+
   const [{ pageIndex, pageSize }, setPagination] =
   React.useState<PaginationState>({
     pageIndex: 0,
-    pageSize: 10,
+    pageSize: 100,
   })
   const fetchDataOptions = {
     pageIndex,
     pageSize,
-    search
+    search,
+    sorting
   }
-  const {data, isLoading} = useQuery(
+  const {data, isLoading, isFetching} = useQuery(
     ['jobs', fetchDataOptions],
-    () => getJobs({ page: fetchDataOptions.pageIndex + 1, filter: search}),
+    () => {
+      const order = sorting.length > 0 ? sorting[0].desc ? '-' + sorting[0].id : sorting[0].id : ''
+      return getJobs({ pageIndex, pageSize, filter: search, order})},
     { keepPreviousData: true }
   )
   
@@ -99,6 +103,7 @@ export function DataTable<TData extends { showJobDetails?: Job }, TValue>({
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
     onSortingChange: setSorting,
+    manualSorting: true,
     pageCount: data?.count || -1,
     onPaginationChange: setPagination,
     manualPagination: true,
@@ -115,17 +120,34 @@ export function DataTable<TData extends { showJobDetails?: Job }, TValue>({
           placeholder="Search..."
           defaultValue={search}
           onChange={(event) => {
-            if (event.target.value.length > 3) {
-              setPagination({ pageIndex: 0, pageSize: 10 })
-              setSearch(event.target.value)
-            }
+            setPagination({ pageIndex: 0, pageSize: 100 })
+            setSearch(event.target.value)
           }
           }
-          className="max-w-sm"
+          className="max-w-sm mr-1"
         />
         {
-          search.length > 0 && search.length < 4 ? <span className='text-blue-400'>Type some more to filter...</span> : null
+          search.length > 0 && search.length < 4 ? <span className='text-red-400 text-sm'>Type some more to filter...</span> : null
         }
+        <div className="flex items-center justify-self-end space-x-2 py-4 mx-5">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => table.previousPage()}
+          disabled={!table.getCanPreviousPage() || search.length > 3}
+        >
+          Previous
+        </Button>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => table.nextPage()}
+          disabled={!table.getCanNextPage() || search.length > 3}
+        >
+          Next
+        </Button>
+      </div>
+      <span>{isFetching && <ShadowInnerIcon width={20} height={20} className="animate-spin"/>}</span>
       </div>
       <div className="rounded-md border">
         <Table>
@@ -157,7 +179,7 @@ export function DataTable<TData extends { showJobDetails?: Job }, TValue>({
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
-                      {false ?
+                      {isLoading ?
                         <Skeleton key={Math.random() * 10000} className="h-5 m-1 w-100 rounded-full" />
                         : flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </TableCell>

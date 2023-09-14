@@ -1,9 +1,10 @@
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL
+const camelToSnakeCase = str => str.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`);
 
-export async function getJobs({ page = 0 , filter}: {page: any, filter: any}) {
-    console.log(filter, 'arst')
+export async function getJobs({ pageIndex = 0, pageSize = 100, filter, order}: {pageIndex: any, pageSize: any, filter: any, order: any}) {
     const search = filter ? `&search=${filter}` : ''
-    const response = await fetch(`${baseUrl}/jobs/?page=${page}${search}`)
+    order = order ? camelToSnakeCase(order) : ''
+    const response = await fetch(`${baseUrl}/jobs/?limit=${pageSize}&offset=${pageIndex}${search}&ordering=${order}`)
     return response.json()
 }
 export async function getJob(jobId) {
