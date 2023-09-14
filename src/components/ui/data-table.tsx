@@ -1,15 +1,15 @@
 "use client"
 import { Skeleton } from "@/components/ui/skeleton"
-
 import {
+  useReactTable,
   ColumnDef,
   flexRender,
   getCoreRowModel,
-  useReactTable,
-  ColumnFiltersState,
-  getFilteredRowModel,
+  PaginationState,
+  getPaginationRowModel,
+  SortingState,
+  getSortedRowModel,
 } from "@tanstack/react-table"
-
 import {
   Table,
   TableBody,
@@ -18,49 +18,59 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-
 import { Button } from "@/components/ui/button"
-
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogHeader,
   DialogFooter,
 } from "@/components/ui/dialog"
-
-
 import { Input } from "@/components/ui/input"
-
 import { Toggle } from "@/components/ui/toggle"
-
 import * as React from "react"
-
 import type { Job } from "@/app/page"
-
 import { useEffect } from "react"
-import { CopyIcon, CheckIcon } from "@radix-ui/react-icons"
-
+import { CopyIcon, CheckIcon, BackpackIcon } from "@radix-ui/react-icons"
+import { getJobs, getJob } from "@/app/api";
+import { useQuery } from "@tanstack/react-query"
+import { ShadowInnerIcon } from "@radix-ui/react-icons";
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
-  data: TData[]
-  openRowById?: number
+  showJobDetails?: Job
 }
 
-export function DataTable<TData extends { id?: number }, TValue>({
+export function DataTable<TData extends { showJobDetails?: Job }, TValue>({
   columns,
-  data,
-  openRowById,
+  showJobDetails,
 }: DataTableProps<TData, TValue>) {
-
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    []
-  )
-  const [isFilterLoading, setIsFilterLoading] = React.useState(false)
   const [dialogContent, setDialogContent] = React.useState<Job>()
   const [dialogOpen, setDialogOpen] = React.useState(false)
   const [copiedLink, setCopiedLink] = React.useState(false)
-
+  const [sorting, setSorting] = React.useState<SortingState>([])
+  const [search, setSearch] = React.useState<string>('')
+  const [{ pageIndex, pageSize }, setPagination] =
+  React.useState<PaginationState>({
+    pageIndex: 0,
+    pageSize: 10,
+  })
+  const fetchDataOptions = {
+    pageIndex,
+    pageSize,
+    search
+  }
+  const {data, isLoading} = useQuery(
+    ['jobs', fetchDataOptions],
+    () => getJobs({ page: fetchDataOptions.pageIndex + 1, filter: search}),
+    { keepPreviousData: true }
+  )
+  
+  const pagination = React.useMemo(
+    () => ({
+      pageIndex,
+      pageSize,
+    }),
+    [pageIndex, pageSize]
+  )
   const copyLink = () => {
     navigator.clipboard.writeText(window.location.href)
     setCopiedLink(true)
@@ -76,24 +86,25 @@ export function DataTable<TData extends { id?: number }, TValue>({
     window.history.pushState({}, null, '/')
   }
   useEffect(() => {
-    if (openRowById) {
-      const row = data.find((r) => {
-        return r.id === openRowById
-      })
-      if (row) {
-        handleDialogOpen(row as unknown as Job)
+    if (showJobDetails) {
+        handleDialogOpen(showJobDetails as unknown as Job)
       }
-    }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
   const table = useReactTable({
-    data,
+    data: data?.results || [],
     columns,
-    onColumnFiltersChange: setColumnFilters,
-    getFilteredRowModel: getFilteredRowModel(),
     getCoreRowModel: getCoreRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    onSortingChange: setSorting,
+    pageCount: data?.count || -1,
+    onPaginationChange: setPagination,
+    manualPagination: true,
     state: {
-      columnFilters,
+      sorting,
+      pagination
     },
   })
 
@@ -101,17 +112,20 @@ export function DataTable<TData extends { id?: number }, TValue>({
     <>
       <div className="flex items-center py-4">
         <Input
-          placeholder="Filter titles..."
-          value={(table.getColumn("title")?.getFilterValue() as string) ?? ""}
+          placeholder="Search..."
+          defaultValue={search}
           onChange={(event) => {
-            setIsFilterLoading(true)
-            // Do we need this?
-            setTimeout(() => setIsFilterLoading(false), 500)
-            table.getColumn("title")?.setFilterValue(event.target.value)
+            if (event.target.value.length > 3) {
+              setPagination({ pageIndex: 0, pageSize: 10 })
+              setSearch(event.target.value)
+            }
           }
           }
           className="max-w-sm"
         />
+        {
+          search.length > 0 && search.length < 4 ? <span className='text-blue-400'>Type some more to filter...</span> : null
+        }
       </div>
       <div className="rounded-md border">
         <Table>
@@ -143,7 +157,7 @@ export function DataTable<TData extends { id?: number }, TValue>({
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
-                      {isFilterLoading ?
+                      {false ?
                         <Skeleton key={Math.random() * 10000} className="h-5 m-1 w-100 rounded-full" />
                         : flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </TableCell>
@@ -160,13 +174,31 @@ export function DataTable<TData extends { id?: number }, TValue>({
           </TableBody>
         </Table>
       </div>
+      <div className="flex items-center justify-end space-x-2 py-4">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => table.previousPage()}
+          disabled={!table.getCanPreviousPage() || search.length > 3}
+        >
+          Previous
+        </Button>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => table.nextPage()}
+          disabled={!table.getCanNextPage() || search.length > 3}
+        >
+          Next
+        </Button>
+      </div>
       <Dialog modal={true} open={dialogOpen} onOpenChange={() => onDialogClose()}>
         <DialogContent>
           <DialogHeader className="text-left w-100 items-start">
             <h3>{dialogContent?.title}</h3>
             <h4>{dialogContent?.companyName}</h4>
             <p>{dialogContent?.location}</p>
-            <p>💼: {dialogContent?.minimumExperience} years</p>
+            <p><BackpackIcon className="inline" width={14} height={14} />: {dialogContent?.minimumExperience} years</p>
             <Toggle
               className="w-full"
               size="lg"
